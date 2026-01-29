@@ -1,0 +1,33 @@
+{
+  "name": "local-analysis-tools-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for local code analysis: linting, coverage, and duplication detection",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thacherhussain/local-analysis-tools-mcp.git"
+  },
+  "bugs": "https://github.com/thacherhussain/local-analysis-tools-mcp/issues",
+  "homepage": "https://github.com/thacherhussain/local-analysis-tools-mcp#readme",
+  "main": "dist/index.js",
+  "bin": {
+    "local-analysis-tools-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.21",
+    "jest": "^29.7.0",
+    "jscpd": "^4.0.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
+  }
+}
