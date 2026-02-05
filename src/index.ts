@@ -102,7 +102,9 @@ function detectWorkspaceFromFilePaths(files: string[]): void {
     const projectRoot = findProjectRoot(path.dirname(file))
     if (projectRoot) {
       cachedWorkspaceDir = projectRoot
-      console.error(`[MCP] Auto-detected workspace from file path: ${projectRoot}`)
+      console.error(
+        `[MCP] Auto-detected workspace from file path: ${projectRoot}`
+      )
       return
     }
   }
@@ -242,7 +244,7 @@ const tools: Tool[] = [
           description:
             'Array of file paths to lint (relative to workspace root)',
         },
-          },
+      },
       required: ['files'],
     },
   },
@@ -274,12 +276,12 @@ const tools: Tool[] = [
         },
         includeNewCodeMetrics: {
           type: 'boolean',
-    description:
+          description:
             'Whether to calculate new code coverage (lines changed vs base branch). Defaults to true for branch scope, false for package scope.',
         },
         baseBranch: {
           type: 'string',
-    description:
+          description:
             'Base branch to compare against for "new code" calculation (defaults to master)',
         },
       },
@@ -398,15 +400,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 // Handle roots/list_changed notification from the client
 // This allows the server to update its workspace when Cursor's workspace changes
-server.setNotificationHandler(
-  RootsListChangedNotificationSchema,
-  async () => {
-    console.error('[MCP] Received roots/list_changed notification, refreshing workspace...')
-    // Clear cached workspace and request new roots
-    cachedWorkspaceDir = null
-    await requestWorkspaceRoots()
-  }
-)
+server.setNotificationHandler(RootsListChangedNotificationSchema, async () => {
+  console.error(
+    '[MCP] Received roots/list_changed notification, refreshing workspace...'
+  )
+  // Clear cached workspace and request new roots
+  cachedWorkspaceDir = null
+  await requestWorkspaceRoots()
+})
 
 // Helper to format elapsed time
 const formatElapsed = (startTime: number): string => {
@@ -444,15 +445,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const allFiles = workingFiles.all
 
         if (allFiles.length === 0) {
-        return {
-          content: [
-            {
-              type: 'text',
+          return {
+            content: [
+              {
+                type: 'text',
                 text: `No TypeScript/JavaScript files found for this branch (committed, uncommitted, or staged).`,
-            },
-          ],
+              },
+            ],
+          }
         }
-      }
 
         const result = await runLocalScan({
           projectDir,
@@ -460,17 +461,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         })
 
         if (!result.success) {
-        return {
-          content: [
-            {
-              type: 'text',
+          return {
+            content: [
+              {
+                type: 'text',
                 text: `ESLint lint failed: ${result.error}`,
               },
             ],
             isError: true,
           }
         }
-        
+
         const committedCount = workingFiles.branch.length
         const uncommittedCount = workingFiles.changed.filter(
           (f) => !workingFiles.branch.includes(f)
@@ -482,19 +483,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         ).length
 
         if (result.issues.length === 0) {
-        return {
-          content: [
-            {
-              type: 'text',
+          return {
+            content: [
+              {
+                type: 'text',
                 text: `Linted **${
                   allFiles.length
                 } file(s)** on this branch (${committedCount} committed, ${uncommittedCount} uncommitted, ${stagedCount} staged) vs \`${baseBranch}\`. **No issues found.** ✅ ⏱️ *${formatElapsed(
                   startTime
                 )}*`,
-            },
-          ],
+              },
+            ],
+          }
         }
-      }
 
         const issueRows = result.issues
           .slice(0, 20)
@@ -507,7 +508,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             } |`
           })
           .join('\n')
-        
+
         return {
           content: [
             {
@@ -544,16 +545,16 @@ ${
         const allFiles = [...new Set([...changedFiles, ...stagedFiles])]
 
         if (allFiles.length === 0) {
-        return {
-          content: [
-            {
-              type: 'text',
+          return {
+            content: [
+              {
+                type: 'text',
                 text: 'No uncommitted or staged TypeScript/JavaScript files found.',
-            },
-          ],
+              },
+            ],
+          }
         }
-      }
-        
+
         const result = await runLocalScan({
           projectDir,
           files: allFiles,
@@ -597,7 +598,7 @@ ${
         const issueRows = result.issues
           .slice(0, 20)
           .map((i) => {
-          const fileName = i.file.split('/').pop() || i.file
+            const fileName = i.file.split('/').pop() || i.file
             return `| ${fileName} | ${i.line} | ${i.severity} | ${
               i.rule
             } | ${i.message.slice(0, 40)}${
@@ -662,10 +663,10 @@ ${
         }
 
         if (result.issues.length === 0) {
-        return {
-          content: [
-            {
-              type: 'text',
+          return {
+            content: [
+              {
+                type: 'text',
                 text: `Linted **${
                   commitFiles.length
                 } file(s)** from the most recent commit with ESLint. **No issues found.** ✅ ⏱️ *${formatElapsed(
@@ -679,7 +680,7 @@ ${
         const issueRows = result.issues
           .slice(0, 20)
           .map((i) => {
-          const fileName = i.file.split('/').pop() || i.file
+            const fileName = i.file.split('/').pop() || i.file
             return `| ${fileName} | ${i.line} | ${i.severity} | ${
               i.rule
             } | ${i.message.slice(0, 40)}${
@@ -748,10 +749,10 @@ ${
         )
 
         if (tsJsFiles.length === 0) {
-        return {
-          content: [
-            {
-              type: 'text',
+          return {
+            content: [
+              {
+                type: 'text',
                 text: 'No TypeScript/JavaScript files found in the provided file list.',
               },
             ],
@@ -793,7 +794,7 @@ ${
         const issueRows = result.issues
           .slice(0, 20)
           .map((i) => {
-          const fileName = i.file.split('/').pop() || i.file
+            const fileName = i.file.split('/').pop() || i.file
             return `| ${fileName} | ${i.line} | ${i.severity} | ${
               i.rule
             } | ${i.message.slice(0, 40)}${
@@ -834,10 +835,10 @@ ${
         const includeNewCodeMetrics = args?.includeNewCodeMetrics as
           | boolean
           | undefined
-        
+
         // Determine files based on scope
         let scopeDescription = ''
-        
+
         switch (scope) {
           case 'directory': {
             if (!directoryName) {
@@ -857,7 +858,9 @@ ${
                 content: [
                   {
                     type: 'text',
-                    text: dirResult.error || `Directory "${directoryName}" not found.`,
+                    text:
+                      dirResult.error ||
+                      `Directory "${directoryName}" not found.`,
                   },
                 ],
                 isError: true,
@@ -867,7 +870,7 @@ ${
             scopeDescription = `directory: ${dirResult.resolvedPath}`
             break
           }
-            
+
           case 'files':
             if (!files || files.length === 0) {
               return {
@@ -882,7 +885,7 @@ ${
             }
             scopeDescription = `${files.length} specific file(s)`
             break
-            
+
           case 'branch':
           default:
             if (directoryName) {
@@ -899,7 +902,7 @@ ${
             }
             break
         }
-        
+
         if (!files || files.length === 0) {
           return {
             content: [
@@ -938,27 +941,27 @@ ${
         // Build formatted response
         const newCodeInfo =
           shouldIncludeNewCode && result.summary.totalNewLines > 0
-          ? ` New code coverage: **${result.summary.newCodeCoverage}%** (${result.summary.coveredNewLines}/${result.summary.totalNewLines} lines).`
-          : ''
-        
+            ? ` New code coverage: **${result.summary.newCodeCoverage}%** (${result.summary.coveredNewLines}/${result.summary.totalNewLines} lines).`
+            : ''
+
         const summaryText = `Checked coverage for **${scopeDescription}** (${result.summary.totalFiles} file(s)). Overall coverage: **${result.summary.overallCoverage}%** (${result.summary.coveredLines}/${result.summary.totalLines} lines).${newCodeInfo}`
-        
+
         // Build file table
-        const fileHeaders = shouldIncludeNewCode 
+        const fileHeaders = shouldIncludeNewCode
           ? '| File | Overall | New Code | Uncovered New Lines |'
           : '| File | Coverage | Lines Covered |'
         const fileSeparator = shouldIncludeNewCode
           ? '|------|---------|----------|---------------------|'
           : '|------|----------|---------------|'
-        
+
         const fileRows = result.files
           .slice(0, 15)
           .map((f) => {
-          const fileName = f.relativePath.split('/').pop() || f.relativePath
+            const fileName = f.relativePath.split('/').pop() || f.relativePath
             const shortName =
               fileName.length > 30 ? fileName.slice(0, 27) + '...' : fileName
-          
-          if (shouldIncludeNewCode) {
+
+            if (shouldIncludeNewCode) {
               const uncoveredNew =
                 f.uncoveredNewLines.length > 0
                   ? f.uncoveredNewLines.slice(0, 5).join(', ') +
@@ -967,9 +970,9 @@ ${
               return `| ${shortName} | ${f.coveragePercent}% | ${
                 f.newLines > 0 ? f.newCodeCoveragePercent + '%' : 'N/A'
               } | ${uncoveredNew} |`
-          } else {
-            return `| ${shortName} | ${f.coveragePercent}% | ${f.coveredLines}/${f.totalLines} |`
-          }
+            } else {
+              return `| ${shortName} | ${f.coveragePercent}% | ${f.coveredLines}/${f.totalLines} |`
+            }
           })
           .join('\n')
 
@@ -997,10 +1000,10 @@ ${
       case 'check_committed': {
         const projectDir = getWorkspaceDir()
         const baseBranch = (args?.baseBranch as string) || 'master'
-        
+
         // Get files changed on the branch
         const branchFiles = await getBranchFiles(projectDir, baseBranch)
-        
+
         if (branchFiles.length === 0) {
           return {
             content: [
@@ -1013,16 +1016,16 @@ ${
         }
 
         const fileNames = branchFiles.map((f) => f.split('/').pop()).join(', ')
-        
+
         // Pre-compute changed lines once to share with coverage and duplication checks
         const changedLines = await getChangedLines(projectDir, baseBranch)
-        
+
         // Run all three checks in parallel with timing, passing pre-computed changedLines
         const [lintTimed, coverageTimed, duplicationTimed] = await Promise.all([
           timed(() =>
             runLocalScan({
-            projectDir,
-            files: branchFiles,
+              projectDir,
+              files: branchFiles,
             })
           ),
           timed(() =>
@@ -1040,20 +1043,20 @@ ${
         // Build summary with timing
         const lintStatus =
           lintResult.success && lintResult.issues.length === 0
-          ? '✅ No issues' 
-          : `⚠️ ${lintResult.issues.length} issue(s)`
-        
-        const coverageStatus = coverageResult.success 
+            ? '✅ No issues'
+            : `⚠️ ${lintResult.issues.length} issue(s)`
+
+        const coverageStatus = coverageResult.success
           ? coverageResult.summary.newCodeCoverage >= 80
-              ? `✅ ${coverageResult.summary.newCodeCoverage}%`
+            ? `✅ ${coverageResult.summary.newCodeCoverage}%`
             : `⚠️ ${coverageResult.summary.newCodeCoverage}%`
           : '❌ Failed'
-        
+
         const newCodeDupPercent =
           duplicationResult.newCodeDuplication?.duplicatedPercent || 0
         const duplicationStatus = duplicationResult.success
           ? newCodeDupPercent <= 3
-              ? `✅ ${newCodeDupPercent}%`
+            ? `✅ ${newCodeDupPercent}%`
             : `⚠️ ${newCodeDupPercent}%`
           : '❌ Failed'
 
@@ -1074,20 +1077,20 @@ ${
 
         // Build detailed sections
         let details = ''
-        
+
         // Linting details
         if (lintResult.issues.length > 0) {
           const issueRows = lintResult.issues
             .slice(0, 5)
             .map((i) => {
-            const fileName = i.file.split('/').pop() || i.file
+              const fileName = i.file.split('/').pop() || i.file
               return `| ${fileName} | ${i.line} | ${i.rule} | ${i.message.slice(
                 0,
                 35
               )}${i.message.length > 35 ? '...' : ''} |`
             })
             .join('\n')
-          
+
           details += `
 ### Linting Issues (${lintResult.issues.length})
 
@@ -1100,13 +1103,13 @@ ${
     : ''
 }`
         }
-        
+
         // Coverage details
         if (coverageResult.success) {
           const lowCoverageFiles = coverageResult.files
             .filter((f) => f.newLines > 0 && f.newCodeCoveragePercent < 80)
             .slice(0, 5)
-          
+
           if (lowCoverageFiles.length > 0) {
             const coverageRows = lowCoverageFiles
               .map((f) => {
@@ -1115,10 +1118,10 @@ ${
                 const uncovered =
                   f.uncoveredNewLines.slice(0, 3).join(', ') +
                   (f.uncoveredNewLines.length > 3 ? '...' : '')
-              return `| ${fileName} | ${f.newCodeCoveragePercent}% | ${uncovered} |`
+                return `| ${fileName} | ${f.newCodeCoveragePercent}% | ${uncovered} |`
               })
               .join('\n')
-            
+
             details += `
 
 ### Files Needing Tests
@@ -1128,7 +1131,7 @@ ${
 ${coverageRows}`
           }
         }
-        
+
         // Duplication details
         if (
           duplicationResult.success &&
@@ -1141,10 +1144,10 @@ ${coverageRows}`
                 d.firstFile.name.split('/').pop() || d.firstFile.name
               const file2 =
                 d.secondFile.name.split('/').pop() || d.secondFile.name
-            return `| ${file1}:${d.firstFile.startLine}-${d.firstFile.endLine} | ${file2}:${d.secondFile.startLine}-${d.secondFile.endLine} | ${d.lines} |`
+              return `| ${file1}:${d.firstFile.startLine}-${d.firstFile.endLine} | ${file2}:${d.secondFile.startLine}-${d.secondFile.endLine} | ${d.lines} |`
             })
             .join('\n')
-          
+
           details += `
 
 ### Duplicated Code (${duplicationResult.duplicates.length} clone(s))
@@ -1444,7 +1447,7 @@ ${details}${callToAction}`,
       case 'check_branch': {
         const projectDir = getWorkspaceDir()
         const baseBranch = (args?.baseBranch as string) || 'master'
-        
+
         // Get ALL working files with breakdown in a single call (avoids duplicate git operations)
         const workingFiles = await getAllWorkingFiles(projectDir, baseBranch)
         const {
@@ -1453,7 +1456,7 @@ ${details}${callToAction}`,
           changed: changedFiles,
           staged: stagedFiles,
         } = workingFiles
-        
+
         if (allFiles.length === 0) {
           return {
             content: [
@@ -1473,16 +1476,16 @@ ${details}${callToAction}`,
         const stagedOnly = stagedFiles.filter(
           (f) => !branchFiles.includes(f) && !changedFiles.includes(f)
         ).length
-        
+
         // Pre-compute changed lines once to share with coverage and duplication checks
         const changedLines = await getChangedLines(projectDir, baseBranch)
-        
+
         // Run all three checks in parallel with timing, passing pre-computed changedLines
         const [lintTimed, coverageTimed, duplicationTimed] = await Promise.all([
           timed(() =>
             runLocalScan({
-            projectDir,
-            files: allFiles,
+              projectDir,
+              files: allFiles,
             })
           ),
           timed(() =>
@@ -1500,20 +1503,20 @@ ${details}${callToAction}`,
         // Build summary with timing
         const lintStatus =
           lintResult.success && lintResult.issues.length === 0
-          ? '✅ No issues' 
-          : `⚠️ ${lintResult.issues.length} issue(s)`
-        
-        const coverageStatus = coverageResult.success 
+            ? '✅ No issues'
+            : `⚠️ ${lintResult.issues.length} issue(s)`
+
+        const coverageStatus = coverageResult.success
           ? coverageResult.summary.newCodeCoverage >= 80
-              ? `✅ ${coverageResult.summary.newCodeCoverage}%`
+            ? `✅ ${coverageResult.summary.newCodeCoverage}%`
             : `⚠️ ${coverageResult.summary.newCodeCoverage}%`
           : '❌ Failed'
-        
+
         const newCodeDupPercent =
           duplicationResult.newCodeDuplication?.duplicatedPercent || 0
         const duplicationStatus = duplicationResult.success
           ? newCodeDupPercent <= 3
-              ? `✅ ${newCodeDupPercent}%`
+            ? `✅ ${newCodeDupPercent}%`
             : `⚠️ ${newCodeDupPercent}%`
           : '❌ Failed'
 
@@ -1534,20 +1537,20 @@ ${details}${callToAction}`,
 
         // Build detailed sections
         let details = ''
-        
+
         // Linting details
         if (lintResult.issues.length > 0) {
           const issueRows = lintResult.issues
             .slice(0, 5)
             .map((i) => {
-            const fileName = i.file.split('/').pop() || i.file
+              const fileName = i.file.split('/').pop() || i.file
               return `| ${fileName} | ${i.line} | ${i.rule} | ${i.message.slice(
                 0,
                 35
               )}${i.message.length > 35 ? '...' : ''} |`
             })
             .join('\n')
-          
+
           details += `
 ### Linting Issues (${lintResult.issues.length})
 
@@ -1560,13 +1563,13 @@ ${
     : ''
 }`
         }
-        
+
         // Coverage details
         if (coverageResult.success) {
           const lowCoverageFiles = coverageResult.files
             .filter((f) => f.newLines > 0 && f.newCodeCoveragePercent < 80)
             .slice(0, 5)
-          
+
           if (lowCoverageFiles.length > 0) {
             const coverageRows = lowCoverageFiles
               .map((f) => {
@@ -1575,10 +1578,10 @@ ${
                 const uncovered =
                   f.uncoveredNewLines.slice(0, 3).join(', ') +
                   (f.uncoveredNewLines.length > 3 ? '...' : '')
-              return `| ${fileName} | ${f.newCodeCoveragePercent}% | ${uncovered} |`
+                return `| ${fileName} | ${f.newCodeCoveragePercent}% | ${uncovered} |`
               })
               .join('\n')
-            
+
             details += `
 
 ### Files Needing Tests
@@ -1588,7 +1591,7 @@ ${
 ${coverageRows}`
           }
         }
-        
+
         // Duplication details
         if (
           duplicationResult.success &&
@@ -1601,10 +1604,10 @@ ${coverageRows}`
                 d.firstFile.name.split('/').pop() || d.firstFile.name
               const file2 =
                 d.secondFile.name.split('/').pop() || d.secondFile.name
-            return `| ${file1}:${d.firstFile.startLine}-${d.firstFile.endLine} | ${file2}:${d.secondFile.startLine}-${d.secondFile.endLine} | ${d.lines} |`
+              return `| ${file1}:${d.firstFile.startLine}-${d.firstFile.endLine} | ${file2}:${d.secondFile.startLine}-${d.secondFile.endLine} | ${d.lines} |`
             })
             .join('\n')
-          
+
           details += `
 
 ### Duplicated Code (${duplicationResult.duplicates.length} clone(s))
@@ -2086,11 +2089,11 @@ ${
         const baseBranch = (args?.baseBranch as string) || 'master'
         const scope = (args?.scope as string) || 'branch'
         const maxSimilarFiles = (args?.maxSimilarFiles as number) || 3
-        
+
         // Get files based on scope
         let files: string[] = []
         let scopeDescription = ''
-        
+
         switch (scope) {
           case 'staged':
             files = await getStagedFiles(projectDir)
@@ -2106,7 +2109,7 @@ ${
             scopeDescription = `files changed on branch vs ${baseBranch}`
             break
         }
-        
+
         if (files.length === 0) {
           return {
             content: [
@@ -2117,14 +2120,14 @@ ${
             ],
           }
         }
-        
+
         // Gather review context
         const context = await gatherReviewContext(
           projectDir,
           files,
           maxSimilarFiles
         )
-        
+
         // Build output for AI analysis
         let output = `## Code Review Context
 
@@ -2157,7 +2160,7 @@ These are the files that have been modified. Review them for:
 - Inconsistencies with established patterns
 
 `
-        
+
         for (const file of context.changedFiles) {
           output += `### ${file.relativePath}
 
@@ -2171,14 +2174,14 @@ ${file.content}
 
 `
         }
-        
+
         if (context.similarFiles.length > 0) {
           output += `## Similar Files (for comparison)
 
 These files follow similar patterns and can be used as reference for expected conventions:
 
 `
-          
+
           for (const file of context.similarFiles) {
             output += `### ${file.relativePath}
 
@@ -2193,16 +2196,32 @@ ${file.content}
 `
           }
         }
-        
+
         output += `## Review Instructions
 
 Please analyze the changed files and compare them to the similar files. Look for:
 
+### Code Quality Issues
 1. **Convention violations** - Are the changed files following the same patterns as similar files?
 2. **Missing error handling** - If hooks return errors, are they being properly destructured and used?
 3. **Loading state issues** - Are loading states being used correctly (e.g., using isDataLoading vs combined isLoading)?
 4. **Inconsistencies** - Do the changed files deviate from established patterns in similar files?
 5. **Logic issues** - Are there any bugs or logic problems in the changes?
+
+### Safety & Edge Cases
+6. **Array access without bounds checking** - Are array elements accessed (e.g., \`arr[0]\`, \`arr[arr.length - 1]\`) without first checking if the array is empty? Look for functions that filter arrays and may return empty results.
+7. **Null/undefined access** - Are optional values accessed without null checks? Look for chained property access on potentially undefined objects.
+8. **Unvalidated assumptions** - Are there comments claiming validation happens elsewhere without verification? Check if upstream components actually perform the claimed validation.
+
+### Test Quality Issues
+9. **Test describe/it block naming** - Do test block names accurately describe the function or behavior being tested? Look for renamed functions where test names weren't updated.
+10. **Missing edge case tests** - Are edge cases (empty arrays, null values, error states) covered in tests?
+11. **Test data accuracy** - Do mock objects and test data reflect realistic scenarios?
+
+### Code Organization Issues
+12. **Unused exports** - Are there exported functions/types only used in test files but not in production code? These should either be removed, made internal, or the production code should be updated to use them.
+13. **Dead code** - Is there commented-out code, unreachable branches, or functions that are never called?
+14. **Duplicate logic** - Is similar logic duplicated across files that could be extracted to a shared utility?
 
 ⏱️ *Context gathered in ${formatElapsed(startTime)}*`
 
@@ -2222,10 +2241,10 @@ Please analyze the changed files and compare them to the similar files. Look for
         const scope = (args?.scope as string) || 'branch'
         const directoryName = args?.directory as string | undefined
         let files = args?.files as string[] | undefined
-        
+
         // Determine files based on scope
         let scopeDescription = ''
-        
+
         switch (scope) {
           case 'directory': {
             if (!directoryName) {
@@ -2245,7 +2264,9 @@ Please analyze the changed files and compare them to the similar files. Look for
                 content: [
                   {
                     type: 'text',
-                    text: dirResult.error || `Directory "${directoryName}" not found.`,
+                    text:
+                      dirResult.error ||
+                      `Directory "${directoryName}" not found.`,
                   },
                 ],
                 isError: true,
@@ -2255,7 +2276,7 @@ Please analyze the changed files and compare them to the similar files. Look for
             scopeDescription = `directory: ${dirResult.resolvedPath}`
             break
           }
-            
+
           case 'files':
             if (!files || files.length === 0) {
               return {
@@ -2270,7 +2291,7 @@ Please analyze the changed files and compare them to the similar files. Look for
             }
             scopeDescription = `${files.length} specific file(s)`
             break
-            
+
           case 'branch':
           default:
             if (directoryName) {
@@ -2286,7 +2307,7 @@ Please analyze the changed files and compare them to the similar files. Look for
             }
             break
         }
-        
+
         if (!files || files.length === 0) {
           return {
             content: [
@@ -2317,14 +2338,14 @@ Please analyze the changed files and compare them to the similar files. Look for
         }
 
         // Build summary
-        const newCodeInfo = result.newCodeDuplication 
+        const newCodeInfo = result.newCodeDuplication
           ? ` New code duplication: **${result.newCodeDuplication.duplicatedPercent}%** (${result.newCodeDuplication.duplicatedNewLines}/${result.newCodeDuplication.totalNewLines} new lines are duplicated).`
           : ''
-        
+
         const comparisonNote =
           scope === 'branch' ? ' (compared against entire codebase)' : ''
         const summaryText = `Checked duplication for **${scopeDescription}**${comparisonNote}. Found **${result.summary.clones} duplication(s)** involving your changed files (${result.summary.duplicatedLines} duplicated lines).${newCodeInfo}`
-        
+
         if (result.duplicates.length === 0) {
           return {
             content: [
@@ -2342,10 +2363,10 @@ Please analyze the changed files and compare them to the similar files. Look for
         const dupRows = result.duplicates
           .slice(0, 10)
           .map((d) => {
-          const file1 = d.firstFile.name.split('/').pop() || d.firstFile.name
+            const file1 = d.firstFile.name.split('/').pop() || d.firstFile.name
             const file2 =
               d.secondFile.name.split('/').pop() || d.secondFile.name
-          return `| ${file1}:${d.firstFile.startLine}-${d.firstFile.endLine} | ${file2}:${d.secondFile.startLine}-${d.secondFile.endLine} | ${d.lines} |`
+            return `| ${file1}:${d.firstFile.startLine}-${d.firstFile.endLine} | ${file2}:${d.secondFile.startLine}-${d.secondFile.endLine} | ${d.lines} |`
           })
           .join('\n')
 
